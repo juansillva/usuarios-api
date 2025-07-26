@@ -1,11 +1,9 @@
-Claro! Aqui está o conteúdo formatado em Markdown para o seu README:
-
 ````markdown
-#  🧑🏿‍💻Usuários API
+🧑🏿‍💻Usuários API
 
 API REST para cadastro, login e gerenciamento de usuários com autenticação JWT.
 
-## Tecnologias
+Tecnologias
 
 - Node.js
 - Express
@@ -14,14 +12,14 @@ API REST para cadastro, login e gerenciamento de usuários com autenticação JW
 - SQLite/PostgreSQL (ou outro banco que usar)
 - Swagger para documentação da API
 
-## Funcionalidades
+Funcionalidades
 
 - Cadastro de usuários
 - Login com geração de token JWT
 - Validação e tratamento de erros
 - Proteção de rotas privadas via JWT
 
-## Como rodar o projeto
+Como rodar o projeto
 
 1. Clone o repositório  
 ```bash
@@ -50,12 +48,12 @@ npm start
 
 O servidor estará rodando em `http://localhost:3000`
 
-## Documentação da API
+ Documentação da API
 
 A API está documentada com Swagger e pode ser acessada em:
 `http://localhost:3000/api-docs`
 
-## Endpoints principais
+ Endpoints principais
 
 | Método | Rota      | Descrição                    |
 | ------ | --------- | ---------------------------- |
@@ -67,7 +65,7 @@ A API está documentada com Swagger e pode ser acessada em:
 
 Use o Swagger UI ou ferramentas como Postman para testar os endpoints.
 
-## Boas práticas
+Boas práticas
 
 * Nunca versionar arquivos `.env`
 * Usar `bcrypt` para salvar senhas com hash
