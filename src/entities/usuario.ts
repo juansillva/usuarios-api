@@ -1,25 +1,41 @@
+
 export class Usuario {
-    constructor (
-        private id: number | null,
-        private nome: string,
-        private email: string,
-        private senha: string | null
-    ) 
-    {}
+  constructor(
+    private id: number | null,
+    private nome: string,
+    private email: string,
+    private senhaHash: string
+  ) {}
 
-    public setId(id: number | null): void {
+  public getId(): number | null {
+    return this.id;
+  }
+
+  public getNome(): string {
+    return this.nome;
+  }
+
+  public getEmail(): string {
+    return this.email;
+  }
+
+  public getSenhaHash(): string {
+    return this.senhaHash;
+  }
+
+  public setId(id: number): void {
     this.id = id;
-    }
-     public getId(): number | null{
-       return this.id;
-     }
+  }
 
-      public getNome(): string {
-        return this.nome;
-    }
+  public setNome(nome: string): void {
+    this.nome = nome;
+  }
 
-    public getEmail(): string {
-        return this.email;
-    }
-    
+  public setEmail(email: string): void {
+    this.email = email;
+  }
+
+  public setSenha(senha: string): void {
+    this.senhaHash = senha;
+  }
 }

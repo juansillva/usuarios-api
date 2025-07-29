@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import { Usuario } from "../entities/usuario";
-import { UsuarioCadastroDTO, UsuarioListagemDTO } from "../dto/UsuarioDTO";
+import { UsuarioCadastroDTO } from "../dto/usuarioDTO";
 import { UsuarioCadastro } from "../services/usuarioCadastro.service";
 import { UsuarioListar } from "../services/usuarioListar.service";
 import { UsuarioExcluir } from "../services/usuarioExcluir.service";
-import { ValidateCadastro } from "../middleware/validateCadastro";
+import { Validator } from "../middleware/validateCadastro";
+import { UsuarioAtualizar } from "../services/usuarioAtualizar.service";
 
 export async function cadastrarUsuario(req: Request, res: Response) {
   //Body da requisição POST com (nome, email, senha)
@@ -38,6 +39,7 @@ export async function cadastrarUsuario(req: Request, res: Response) {
   }
 }
 
+
 export async function listarUsuarios(req: Request, res: Response) {
 
   const usuarios = new UsuarioListar();
@@ -58,6 +60,8 @@ export async function listarUsuarios(req: Request, res: Response) {
 export async function excluirUsuario(req: Request, res: Response) {
 
   const id = Number(req.params);
+  
+  const validate = new ValidateCadastro()
 
   if (id) {
     try {
@@ -73,4 +77,35 @@ export async function excluirUsuario(req: Request, res: Response) {
        }) 
     }
   }
+}
+
+
+export async function alterar (req: Request, res: Response){
+
+    const id = Number(req.params);
+     
+    const {email, senha} = req.body
+    
+     if(email && id){
+      try {
+
+        const novoEmail = await new UsuarioAtualizar().alterarEmail(id,email)
+        res.status(200).json({
+         message: `Seu email foi atualizado ${novoEmail}`
+      })
+      } catch (error: any) {
+        res.status(400).json({
+          message: error
+        })
+      }
+
+      }
+
+      if(senha && id){
+        try {
+          const novaSenha = await new UsuarioAtualizar().alterarSenha(id, senha)
+        } catch (error) {
+          
+        }
+      }
 }
