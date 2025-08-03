@@ -1,111 +1,110 @@
 import { Request, Response } from "express";
-import { Usuario } from "../entities/usuario";
+import { UsuarioService } from "../services/usuario.service";
 import { UsuarioCadastroDTO } from "../dto/usuarioDTO";
-import { UsuarioCadastro } from "../services/usuarioCadastro.service";
-import { UsuarioListar } from "../services/usuarioListar.service";
-import { UsuarioExcluir } from "../services/usuarioExcluir.service";
-import { Validator } from "../middleware/validateCadastro";
-import { UsuarioAtualizar } from "../services/usuarioAtualizar.service";
+import { Validator } from "../middleware/validator";
+
+const usuarioService = new UsuarioService();
+const validator = new Validator();
 
 export async function cadastrarUsuario(req: Request, res: Response) {
-  //Body da requisição POST com (nome, email, senha)
   const { nome, email, senha } = req.body;
 
-  //Crio uma variável dto do tipo UsuarioCadastoDTO que vai puxar todas as propriedades (nome, email, senha e referenciar com o do)
   const dto: UsuarioCadastroDTO = {
-    nome: nome,
-    email: email,
-    senha: senha,
+    nome,
+    email,
+    senha,
   };
 
-  const usuarioCadastrado = new UsuarioCadastro();
-
-  const validate = new ValidateCadastro()
-
   try {
+    validator.validateAll(nome, email, senha);
 
-    await validate.validator(dto.nome, dto.email, dto.senha)
-
-    const novoUsuario = await usuarioCadastrado.cadastrarUsuario(dto);
+    const novoUsuario = await usuarioService.cadastrarUsuario(dto);
 
     res.status(201).json({
       message: "Usuário cadastrado com sucesso!",
-      usuario: novoUsuario
+      usuario: novoUsuario.toJSON(),
     });
-  } catch (error: any ) {
-    res.status(400).json({
-      message: error.message
-    });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
   }
 }
 
-
 export async function listarUsuarios(req: Request, res: Response) {
-
-  const usuarios = new UsuarioListar();
-
   try {
-    const listaUsuarios = await usuarios.listarUsuarios();
+    const usuarios = await usuarioService.listarUsuarios();
     res.status(200).json({
       message: "Lista de usuários cadastrados no sistema.",
-      usuarios: listaUsuarios
+      usuarios,
     });
   } catch (error: any) {
-    res.status(400).json({
-      message: error.message,
+    res.status(400).json({ message: error.message });
+  }
+}
+
+export async function buscarUsuario(req: Request, res: Response) {
+
+  const nome = req.params.nome;
+
+  if (!nome) {
+    return res.status(400).json({ message: "Usuário inexistente" });
+  }
+
+  try {
+    const usuario = await usuarioService.buscarUsuario(nome);
+    res.json({
+      message: "Usuário encontrado",
+      usuario: usuario,
+    });
+  } catch (error: any) {
+    res.json({
+      message: error,
     });
   }
 }
 
 export async function excluirUsuario(req: Request, res: Response) {
+  const id = Number(req.params.id);
 
-  const id = Number(req.params);
-  
-  const validate = new ValidateCadastro()
+  if (isNaN(id)) {
+    return res.status(400).json({ message: "ID inválido" });
+  }
 
-  if (id) {
-    try {
-       const usuarioExcluido = await new UsuarioExcluir().excluirUsuario(id);
-        if(usuarioExcluido > 0) {
-            res.status(200).json({
-                message: "Usuário excluído com sucesso"
-            })
-        }
-    } catch (error: any) {
-        return res.status(400).json({
-        message: error.message
-       }) 
-    }
+  try {
+    await usuarioService.excluirUsuario(id);
+    res.status(200).json({ message: "Usuário excluído com sucesso" });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
   }
 }
 
+export async function atualizarUsuario(req: Request, res: Response) {
+  
+  const id = Number(req.params.id);
+  const { nome, email, senha } = req.body;
 
-export async function alterar (req: Request, res: Response){
+  if (isNaN(id)) {
+    return res.status(400).json({ message: "ID inválido" });
+  }
 
-    const id = Number(req.params);
-     
-    const {email, senha} = req.body
-    
-     if(email && id){
-      try {
+  if (!nome || !email) {
+    return res.status(400).json({ message: "Nome e email são obrigatórios" });
+  }
 
-        const novoEmail = await new UsuarioAtualizar().alterarEmail(id,email)
-        res.status(200).json({
-         message: `Seu email foi atualizado ${novoEmail}`
-      })
-      } catch (error: any) {
-        res.status(400).json({
-          message: error
-        })
-      }
+  try {
+    validator.validateAll(nome, email, senha ?? "123456");
 
-      }
+    const dto: UsuarioCadastroDTO = {
+      nome,
+      email,
+      senha,
+    };
+    const usuarioAtualizado = await usuarioService.atualizarUsuario(id, dto);
 
-      if(senha && id){
-        try {
-          const novaSenha = await new UsuarioAtualizar().alterarSenha(id, senha)
-        } catch (error) {
-          
-        }
-      }
+    res.status(200).json({
+      message: "Usuário atualizado com sucesso",
+      usuario: usuarioAtualizado,
+    });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
 }

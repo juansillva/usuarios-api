@@ -1,4 +1,3 @@
-
 export class Usuario {
   constructor(
     private id: number | null,
@@ -37,5 +36,13 @@ export class Usuario {
 
   public setSenha(senha: string): void {
     this.senhaHash = senha;
+  }
+
+  toJSON() {
+    return {
+      id: this.id,
+      nome: this.nome,
+      email: this.email,
+    };
   }
 }
